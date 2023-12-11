@@ -3,10 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/PyQT/venv39" />
-      <excludeFolder url="file://$MODULE_DIR$/venv39" />
       <excludeFolder url="file://$MODULE_DIR$/VladProject" />
+      <excludeFolder url="file://$MODULE_DIR$/venv39" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (Simoshin-and-Dyakova)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (venv)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -716,6 +716,115 @@ def shop():
         pygame.display.flip()
 
 
+def settings(screen):
+    running = True
+    pygame.init()
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    color = (22, 26, 30)
+
+    # Задний фон
+    LOADING_BG = pygame.image.load("settings.jpg")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
+    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
+    screen.blit(LOADING_BG, (0, 0))
+    pygame.display.flip()
+
+    # Кнопочки
+    game = get_component_button(screen_width, screen_height, 'Об игре', -200, 100)
+    account = get_component_button(screen_width, screen_height, 'Аккаунт', -100, 100)
+    zvuk = get_component_button(screen_width, screen_height, 'Звук', 0, 100)
+    graphik = get_component_button(screen_width, screen_height, 'Графика', 100, 100)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if game[2].collidepoint(mouse_pos):
+                        Game()
+                        screen.fill((0, 0, 0))
+                    if account[2].collidepoint(mouse_pos):
+                        Account()
+                        screen.fill((0, 0, 0))
+                    if zvuk[2].collidepoint(mouse_pos):
+                        Zvuk()
+                        screen.fill((0, 0, 0))
+                    if graphik[2].collidepoint(mouse_pos):
+                        Graphik()
+                        screen.fill((0, 0, 0))
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, game[2])
+        screen.blit(game[0], game[1])
+        pygame.draw.rect(screen, color, account[2])
+        screen.blit(account[0], account[1])
+        pygame.draw.rect(screen, color, zvuk[2])
+        screen.blit(zvuk[0], zvuk[1])
+        pygame.draw.rect(screen, color, graphik[2])
+        screen.blit(graphik[0], graphik[1])
+
+        clock.tick(50)
+        pygame.display.flip()
+
+
+def Game():
+    running = True
+    pygame.init()
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    color = (22, 26, 30)
+    color2 = (192, 5, 248)
+    LOADING_BG = pygame.image.load("game_settings.jpg")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
+    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
+    screen.blit(LOADING_BG, (0, 0))
+    pygame.display.flip()
+
+    game = get_component_button(screen_width, screen_height, 'Об игре', -200, 100)
+    font = pygame.font.SysFont('comicsansms', 32)
+    opis = font.render("Игра просто пушка!!!", 1, color2, color)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+
+    while running:
+        mouse_pos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if exitt[2].collidepoint(mouse_pos):
+                        settings(screen)
+                        screen.fill(0, 0, 0)
+
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        screen.blit(opis, (200, 200))
+        pygame.draw.rect(screen, color, game[2])
+        screen.blit(game[0], game[1])
+
+        pygame.display.update()
+        pygame.display.flip()
+
+def Account():
+    ...
+
+
+def Zvuk():
+    ...
+
+def Graphik():
+    ...
+
+
 pygame.init()
 screen_width, screen_height = 800, 600
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -739,7 +848,8 @@ while running:
                 if button1[2].collidepoint(mouse_pos):
                     running = False
                 if button2[2].collidepoint(mouse_pos):
-                    ...
+                    settings(screen)
+                    screen.fill((0, 0, 0))
                 if button3[2].collidepoint(mouse_pos):
                     shop()
                     screen.fill((0, 0, 0))

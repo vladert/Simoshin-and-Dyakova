@@ -223,9 +223,9 @@ def settings(screen):
     color = (22, 26, 30)
 
     # Задний фон
-    LOADING_BG = pygame.image.load("settings.jpg")
-    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
-    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
+    LOADING = pygame.image.load("settings.jpg")
+    LOADING_BG_RECT = LOADING.get_rect(center=(400, 340))
+    LOADING_BG = pygame.transform.scale(LOADING, (screen_width, screen_height))
     screen.blit(LOADING_BG, (0, 0))
     pygame.display.flip()
 
@@ -254,7 +254,7 @@ def settings(screen):
                         screen.fill((0, 0, 0))
                     if graphik[2].collidepoint(mouse_pos):
                         Graphik()
-                        screen.fill((0, 0, 0))
+                        screen.fill(0, 0, 0)
                     if exitt[2].collidepoint(mouse_pos):
                         running = False
 
@@ -320,8 +320,62 @@ def Account():
 def Zvuk():
     ...
 
+
 def Graphik():
-    ...
+    running = True
+    pygame.init()
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    color = (255, 255, 255)
+    color1 = (22, 26, 30)
+    color2 = (192, 5, 248)
+    x, y = 200, 200
+    rect_x, rect_y, rect_width, rect_height = 0, 200, 800, 20  # Параметры прямоугольника
+    x_old, x_new = 0, 0
+    moving = False  # Добавляем инициализацию переменной moving
+    clock = pygame.time.Clock()
+    min_fps, max_fps = 30, 120
+    min_rect_x, max_rect_x = 50, 750
+    font = pygame.font.SysFont('comicsansms', 32)
+    game = font.render("Количество FPS", 1, color2, color)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if x < event.pos[0] < x + 100 and y < event.pos[1] < y + 100:
+                    moving = True
+                elif exitt[2].collidepoint(event.pos):
+                    settings(screen)
+                    screen.fill((0, 0, 0))
+
+            if event.type == pygame.MOUSEMOTION:
+                if moving:
+                    x_new, y_new = event.rel
+                    x, y = x + x_new, y + y_new
+                    if x < min_rect_x:
+                        x = min_rect_x
+                    elif x > max_rect_x:
+                        x = max_rect_x
+                    current_fps = int((x - min_rect_x) / (max_rect_x - min_rect_x) * (max_fps - min_fps) + min_fps)
+                    pygame.display.set_caption(f"Current FPS: {current_fps}")
+                    clock.tick(current_fps)
+
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                moving = False
+
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, color, (rect_x, rect_y, rect_width, rect_height))
+        pygame.draw.circle(screen, (0, 0, 255), (x, 200), 50)
+        pygame.draw.rect(screen, color1, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        screen.blit(game, (300, 50))
+        pygame.display.update()
+        pygame.display.flip()
+
+    pygame.quit()
 
 
 pygame.init()

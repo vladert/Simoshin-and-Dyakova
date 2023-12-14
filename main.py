@@ -1,8 +1,9 @@
 import sqlite3
+
 import pygame
 
 
-def get_component_button(screen_width, screen_height, text, step=0, x=1):
+def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0):
     font = pygame.font.Font(None, 50)
     if text == 'Kill all Zombie' or text == 'Оружия':
         font = pygame.font.Font(None, 75)
@@ -15,33 +16,69 @@ def get_component_button(screen_width, screen_height, text, step=0, x=1):
     else:
         button_width = text_surface.get_width() + 40 + x
         button_height = text_surface.get_height() + 20
-        button_x = (screen_width - button_width) // 2
+        button_x = (screen_width - button_width) // 2 + stepx
         button_y = (screen_height - button_height) // 2 + step
 
     button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
 
     text_rect = text_surface.get_rect(center=button_rect.center)
 
-    return (text_surface, text_rect, button_rect)
+    return (text_surface, text_rect, button_rect, text)
 
 
 
 
 def weapon1():
+    LOADING_BG = pygame.image.load("weapon/G22.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
     con = sqlite3.connect('weapon.db')
     cur = con.cursor()
-    res = cur.execute('SELECT gun, characteristics FROM weapons WHERE id == 2').fetchall()
+    res = cur.execute('SELECT gun, characteristics FROM weapons WHERE id == 1').fetchall()
+    res2 = cur.execute('SELECT gun FROM person').fetchall()
     running = True
     screen_width, screen_height = 800, 600
     screen = pygame.display.set_mode((screen_width, screen_height))
-    name = get_component_button(screen_width, screen_height, res[0][1] , -230, 100)
+    font = pygame.font.Font(None, 30)
+    text_surface = font.render(res[0][1], True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    gun1 = get_component_button(screen_width, screen_height, 'G22', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res2[0][0] == 1:
+        yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+   # return (text_surface, text_rect, button_rect)
     while running:
         for event in pygame.event.get():
             # при закрытии окна
             if event.type == pygame.QUIT:
                 exit()
-        pygame.draw.rect(screen, color, name[2])
-        screen.blit(name[0], name[1])
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if yst[3] == 'Взять':
+                            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                            cur.execute('UPDATE person SET gun = 1')
+                            con.commit()
+                            con.close()
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -49,13 +86,13 @@ def weapon1():
 
 
 def weapon2():
-    LOADING_BG = pygame.image.load("weaponUMP.jpg")
+    LOADING_BG = pygame.image.load("weapon/UMP.png")
     LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
 
     con = sqlite3.connect('weapon.db')
     cur = con.cursor()
-    res = cur.execute('SELECT gun, characteristics FROM weapons WHERE id == 2').fetchall()
-    res2 = cur.execute('SELECT gun FROM person').fetchall()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 2').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
     text1 = ' '.join(res[0][1].split()[:8])
     text2 = ' '.join(res[0][1].split()[8:16])
     text3 = ' '.join(res[0][1].split()[16:])
@@ -90,10 +127,13 @@ def weapon2():
 
     gun1 = get_component_button(screen_width, screen_height, 'UMP', -270)
     exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
-    if res2[0][0] == 2:
-        yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
     else:
-        yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+        yst = get_component_button(screen_width, screen_height, '1500 Zom', 200, 1, 300)
     # return (text_surface, text_rect, button_rect)
     while running:
         for event in pygame.event.get():
@@ -106,11 +146,21 @@ def weapon2():
                     if exitt[2].collidepoint(mouse_pos):
                         running = False
                     if yst[2].collidepoint(mouse_pos):
-                        if yst[3] == 'Взять':
-                            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
-                            cur.execute('UPDATE person SET gun = 2')
-                            con.commit()
-                            con.close()
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 2')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 1500:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 1500
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "UMP"')
+                                con.commit()
+
+
         pygame.draw.rect(screen, (0, 0, 0), button_rect)
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
@@ -127,26 +177,477 @@ def weapon2():
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
+    con.close()
 
 
 def weapon3():
-    ...
+    LOADING_BG = pygame.image.load("weapon/P90.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 3').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    text1 = ' '.join(res[0][1].split()[:8])
+    text2 = ' '.join(res[0][1].split()[8:16])
+    text3 = ' '.join(res[0][1].split()[16:])
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    font = pygame.font.Font(None, 30)
+
+    text_surface = font.render(text1, True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+
+    text_surface1 = font.render(text2, True, (255, 255, 255))
+    button_width1 = text_surface1.get_width() + 20
+    button_height1 = text_surface1.get_height() + 20
+    button_x1 = 10
+    button_y1 = 90
+    button_rect1 = pygame.Rect(button_x1, button_y1, button_width1, button_height1)
+    text_rect1 = text_surface1.get_rect(center=button_rect1.center)
+
+    text_surface2 = font.render(text3, True, (255, 255, 255))
+    button_width2 = text_surface2.get_width() + 20
+    button_height2 = text_surface2.get_height() + 20
+    button_x2 = 10
+    button_y2 = 130
+    button_rect2 = pygame.Rect(button_x2, button_y2, button_width2, button_height2)
+    text_rect2 = text_surface2.get_rect(center=button_rect2.center)
+
+    gun1 = get_component_button(screen_width, screen_height, 'P90', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, '3000 Zom', 200, 1, 300)
+    # return (text_surface, text_rect, button_rect)
+    while running:
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 3')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 3000:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 3000
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "P90"')
+                                con.commit()
+
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect1)
+        screen.blit(text_surface1, text_rect1)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect2)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
+    con.close()
 
 
 def weapon4():
-    ...
+    LOADING_BG = pygame.image.load("weapon/AKR.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 4').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    text1 = ' '.join(res[0][1].split()[:10])
+    text2 = ' '.join(res[0][1].split()[10:16])
+    text3 = ' '.join(res[0][1].split()[16:])
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    font = pygame.font.Font(None, 30)
+
+    text_surface = font.render(text1, True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+
+    text_surface1 = font.render(text2, True, (255, 255, 255))
+    button_width1 = text_surface1.get_width() + 20
+    button_height1 = text_surface1.get_height() + 20
+    button_x1 = 10
+    button_y1 = 90
+    button_rect1 = pygame.Rect(button_x1, button_y1, button_width1, button_height1)
+    text_rect1 = text_surface1.get_rect(center=button_rect1.center)
+
+    text_surface2 = font.render(text3, True, (255, 255, 255))
+    button_width2 = text_surface2.get_width() + 20
+    button_height2 = text_surface2.get_height() + 20
+    button_x2 = 10
+    button_y2 = 130
+    button_rect2 = pygame.Rect(button_x2, button_y2, button_width2, button_height2)
+    text_rect2 = text_surface2.get_rect(center=button_rect2.center)
+
+    gun1 = get_component_button(screen_width, screen_height, 'AKR', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, '4500 Zom', 200, 1, 300)
+    # return (text_surface, text_rect, button_rect)
+    while running:
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 4')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 4500:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 4500
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "AKR"')
+                                con.commit()
+
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect1)
+        screen.blit(text_surface1, text_rect1)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect2)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
+    con.close()
 
 
 def weapon5():
-    ...
+    LOADING_BG = pygame.image.load("weapon/M4.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 5').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    text1 = ' '.join(res[0][1].split()[:10])
+    text2 = ' '.join(res[0][1].split()[10:16])
+    text3 = ' '.join(res[0][1].split()[16:])
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    font = pygame.font.Font(None, 30)
+
+    text_surface = font.render(text1, True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+
+    text_surface1 = font.render(text2, True, (255, 255, 255))
+    button_width1 = text_surface1.get_width() + 20
+    button_height1 = text_surface1.get_height() + 20
+    button_x1 = 10
+    button_y1 = 90
+    button_rect1 = pygame.Rect(button_x1, button_y1, button_width1, button_height1)
+    text_rect1 = text_surface1.get_rect(center=button_rect1.center)
+
+    text_surface2 = font.render(text3, True, (255, 255, 255))
+    button_width2 = text_surface2.get_width() + 20
+    button_height2 = text_surface2.get_height() + 20
+    button_x2 = 10
+    button_y2 = 130
+    button_rect2 = pygame.Rect(button_x2, button_y2, button_width2, button_height2)
+    text_rect2 = text_surface2.get_rect(center=button_rect2.center)
+
+    gun1 = get_component_button(screen_width, screen_height, 'M4', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, '6000 Zom', 200, 1, 300)
+    # return (text_surface, text_rect, button_rect)
+    while running:
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 5')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 6000:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 6000
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "M4"')
+                                con.commit()
+
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect1)
+        screen.blit(text_surface1, text_rect1)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect2)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
+    con.close()
 
 
 def weapon6():
-    ...
+    LOADING_BG = pygame.image.load("weapon/M16.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 6').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    text1 = ' '.join(res[0][1].split()[:10])
+    text2 = ' '.join(res[0][1].split()[10:20])
+    text3 = ' '.join(res[0][1].split()[20:])
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    font = pygame.font.Font(None, 30)
+
+    text_surface = font.render(text1, True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+
+    text_surface1 = font.render(text2, True, (255, 255, 255))
+    button_width1 = text_surface1.get_width() + 20
+    button_height1 = text_surface1.get_height() + 20
+    button_x1 = 10
+    button_y1 = 90
+    button_rect1 = pygame.Rect(button_x1, button_y1, button_width1, button_height1)
+    text_rect1 = text_surface1.get_rect(center=button_rect1.center)
+
+    text_surface2 = font.render(text3, True, (255, 255, 255))
+    button_width2 = text_surface2.get_width() + 20
+    button_height2 = text_surface2.get_height() + 20
+    button_x2 = 10
+    button_y2 = 130
+    button_rect2 = pygame.Rect(button_x2, button_y2, button_width2, button_height2)
+    text_rect2 = text_surface2.get_rect(center=button_rect2.center)
+
+    gun1 = get_component_button(screen_width, screen_height, 'M16', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, '8500 Zom', 200, 1, 300)
+    # return (text_surface, text_rect, button_rect)
+    while running:
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 6')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 8500:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 8500
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "M16"')
+                                con.commit()
+
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect1)
+        screen.blit(text_surface1, text_rect1)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect2)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
+    con.close()
 
 
 def weapon7():
-    ...
+    LOADING_BG = pygame.image.load("weapon/AWM.png")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(300, 360))
+
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 7').fetchall()
+    res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    text1 = ' '.join(res[0][1].split()[:10])
+    text2 = ' '.join(res[0][1].split()[10:18])
+    text3 = ' '.join(res[0][1].split()[18:])
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    font = pygame.font.Font(None, 30)
+
+    text_surface = font.render(text1, True, (255, 255, 255))
+    button_width = text_surface.get_width() + 20
+    button_height = text_surface.get_height() + 20
+    button_x = 10
+    button_y = 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+
+    text_surface1 = font.render(text2, True, (255, 255, 255))
+    button_width1 = text_surface1.get_width() + 20
+    button_height1 = text_surface1.get_height() + 20
+    button_x1 = 10
+    button_y1 = 90
+    button_rect1 = pygame.Rect(button_x1, button_y1, button_width1, button_height1)
+    text_rect1 = text_surface1.get_rect(center=button_rect1.center)
+
+    text_surface2 = font.render(text3, True, (255, 255, 255))
+    button_width2 = text_surface2.get_width() + 20
+    button_height2 = text_surface2.get_height() + 20
+    button_x2 = 10
+    button_y2 = 130
+    button_rect2 = pygame.Rect(button_x2, button_y2, button_width2, button_height2)
+    text_rect2 = text_surface2.get_rect(center=button_rect2.center)
+
+    gun1 = get_component_button(screen_width, screen_height, 'AWM', -270)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    if res[0][2] == 1:
+        if res2[0][0] == 2:
+            yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+        else:
+            yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
+    else:
+        yst = get_component_button(screen_width, screen_height, '10000 Zom', 200, 1, 300)
+    # return (text_surface, text_rect, button_rect)
+    while running:
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+                    if yst[2].collidepoint(mouse_pos):
+                        if res[0][2] == 1:
+                            if yst[3] == 'Взять':
+                                yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
+                                cur.execute('UPDATE person SET gun = 7')
+                                con.commit()
+                                con.close()
+                        else:
+                            if res2[0][1] >= 10000:
+                                yst = get_component_button(screen_width, screen_height, 'Взять', 200, 50, 300)
+                                summ = res2[0][1] - 10000
+                                cur.execute(f'UPDATE person SET coins = {summ}')
+                                cur.execute('UPDATE weapons SET open = 1 WHERE gun == "AWM"')
+                                con.commit()
+
+        pygame.draw.rect(screen, (0, 0, 0), button_rect)
+        screen.blit(text_surface, text_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect1)
+        screen.blit(text_surface1, text_rect1)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect2)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, yst[2])
+        screen.blit(yst[0], yst[1])
+        pygame.draw.rect(screen, (0, 0, 0), gun1[2])
+        screen.blit(gun1[0], gun1[1])
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
+    con.close()
 
 
 def shop():
@@ -190,7 +691,7 @@ def shop():
                         weapon7()
                     if exitt[2].collidepoint(mouse_pos):
                         running = False
-
+        screen.fill((0, 0, 0))
         screen.blit(LOADING_BG, LOADING_BG_RECT)
         screen.blit(name[0], name[1])
         pygame.draw.rect(screen, color, exitt[2])
@@ -223,9 +724,9 @@ def settings(screen):
     color = (22, 26, 30)
 
     # Задний фон
-    LOADING = pygame.image.load("settings.jpg")
-    LOADING_BG_RECT = LOADING.get_rect(center=(400, 340))
-    LOADING_BG = pygame.transform.scale(LOADING, (screen_width, screen_height))
+    LOADING_BG = pygame.image.load("settings.jpg")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
+    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
     screen.blit(LOADING_BG, (0, 0))
     pygame.display.flip()
 
@@ -254,7 +755,7 @@ def settings(screen):
                         screen.fill((0, 0, 0))
                     if graphik[2].collidepoint(mouse_pos):
                         Graphik()
-                        screen.fill(0, 0, 0)
+                        screen.fill((0, 0, 0))
                     if exitt[2].collidepoint(mouse_pos):
                         running = False
 
@@ -320,62 +821,44 @@ def Account():
 def Zvuk():
     ...
 
-
-def Graphik():
+def Game():
     running = True
     pygame.init()
     screen_width, screen_height = 800, 600
     screen = pygame.display.set_mode((screen_width, screen_height))
-    color = (255, 255, 255)
-    color1 = (22, 26, 30)
+    color = (22, 26, 30)
     color2 = (192, 5, 248)
-    x, y = 200, 200
-    rect_x, rect_y, rect_width, rect_height = 0, 200, 800, 20  # Параметры прямоугольника
-    x_old, x_new = 0, 0
-    moving = False  # Добавляем инициализацию переменной moving
-    clock = pygame.time.Clock()
-    min_fps, max_fps = 30, 120
-    min_rect_x, max_rect_x = 50, 750
+    LOADING_BG = pygame.image.load("game_settings.jpg")
+    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
+    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
+    screen.blit(LOADING_BG, (0, 0))
+    pygame.display.flip()
+
+    game = get_component_button(screen_width, screen_height, 'Об игре', -200, 100)
     font = pygame.font.SysFont('comicsansms', 32)
-    game = font.render("Количество FPS", 1, color2, color)
+    opis = font.render("Игра просто пушка!!!", 1, color2, color)
     exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
 
     while running:
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if x < event.pos[0] < x + 100 and y < event.pos[1] < y + 100:
-                    moving = True
-                elif exitt[2].collidepoint(event.pos):
-                    settings(screen)
-                    screen.fill((0, 0, 0))
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if exitt[2].collidepoint(mouse_pos):
+                        settings(screen)
+                        screen.fill(0, 0, 0)
 
-            if event.type == pygame.MOUSEMOTION:
-                if moving:
-                    x_new, y_new = event.rel
-                    x, y = x + x_new, y + y_new
-                    if x < min_rect_x:
-                        x = min_rect_x
-                    elif x > max_rect_x:
-                        x = max_rect_x
-                    current_fps = int((x - min_rect_x) / (max_rect_x - min_rect_x) * (max_fps - min_fps) + min_fps)
-                    pygame.display.set_caption(f"Current FPS: {current_fps}")
-                    clock.tick(current_fps)
-
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                moving = False
-
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, color, (rect_x, rect_y, rect_width, rect_height))
-        pygame.draw.circle(screen, (0, 0, 255), (x, 200), 50)
-        pygame.draw.rect(screen, color1, exitt[2])
+        screen.blit(LOADING_BG, LOADING_BG_RECT)
+        pygame.draw.rect(screen, color, exitt[2])
         screen.blit(exitt[0], exitt[1])
-        screen.blit(game, (300, 50))
+        screen.blit(opis, (200, 200))
+        pygame.draw.rect(screen, color, game[2])
+        screen.blit(game[0], game[1])
+
         pygame.display.update()
         pygame.display.flip()
-
-    pygame.quit()
 
 
 pygame.init()

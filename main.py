@@ -1,5 +1,5 @@
 import sqlite3
-
+import sys
 import pygame
 
 
@@ -745,14 +745,13 @@ def settings(screen):
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     if game[2].collidepoint(mouse_pos):
-                        Game()
+                        Gaming()
                         screen.fill((0, 0, 0))
                     if account[2].collidepoint(mouse_pos):
                         Account()
                         screen.fill((0, 0, 0))
                     if zvuk[2].collidepoint(mouse_pos):
                         Zvuk()
-                        screen.fill((0, 0, 0))
                     if graphik[2].collidepoint(mouse_pos):
                         Graphik()
                         screen.fill((0, 0, 0))
@@ -775,7 +774,7 @@ def settings(screen):
         pygame.display.flip()
 
 
-def Game():
+def Gaming():
     running = True
     pygame.init()
     screen_width, screen_height = 800, 600
@@ -819,46 +818,113 @@ def Account():
 
 
 def Zvuk():
-    ...
-
-def Game():
-    running = True
-    pygame.init()
-    screen_width, screen_height = 800, 600
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    color = (22, 26, 30)
-    color2 = (192, 5, 248)
-    LOADING_BG = pygame.image.load("game_settings.jpg")
-    LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
-    LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
-    screen.blit(LOADING_BG, (0, 0))
-    pygame.display.flip()
-
-    game = get_component_button(screen_width, screen_height, 'Об игре', -200, 100)
-    font = pygame.font.SysFont('comicsansms', 32)
-    opis = font.render("Игра просто пушка!!!", 1, color2, color)
+    BLACK = (255, 255, 255)
+    WHITE = (0, 0, 0)
+    # Параметры окна
+    width, height = 800, 600
+    screen = pygame.display.set_mode((width, height))
     exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    pygame.display.set_caption('Управление громкостью')
+    # Параметры ползунка
+    slider_x = 50
+    slider_y = height // 6
+    slider_width = 200
+    slider_height = 20
+    slider_rect = pygame.Rect(slider_x, slider_y, slider_width, slider_height)
+    slider_color = (0, 128, 255)
+    slider_pressed = False
+    font = pygame.font.Font(None, 36)
+    text = font.render('Громкость эффектов', True, BLACK)
+    text_rect = text.get_rect(center=(width // 4, 50))
+    zv1_min = 0
+    zv1_max = 100
 
+    volume_text = font.render("Громкость: 0", True, BLACK)  # Инициализация volume_text перед основным циклом
+    volume_rect = volume_text.get_rect(center=(width // 2, height - 50))
+
+    # Основной цикл
+    running = True
     while running:
-        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit()
+                running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if exitt[2].collidepoint(mouse_pos):
                         settings(screen)
-                        screen.fill(0, 0, 0)
+                        screen.fill((0, 0, 0))
+            elif event.type == pygame.MOUSEBUTTONUP:
+                slider_pressed = False
+            elif event.type == pygame.MOUSEMOTION:
+                if slider_pressed:
+                    if slider_width - slider_rect.width != 0:  # Проверка на ноль перед делением
+                        zv1 = (slider_rect.x - slider_x) / (slider_width - slider_rect.width) * (
+                                    zv1_max - zv1_min) + zv1_min
+                        volume_text = font.render(f"Громкость: {int(zv1)}", True, BLACK)
+                        volume_rect = volume_text.get_rect(center=(width // 2, height - 50))
 
-        screen.blit(LOADING_BG, LOADING_BG_RECT)
-        pygame.draw.rect(screen, color, exitt[2])
+        screen.fill(WHITE)
+        pygame.draw.rect(screen, slider_color, slider_rect)
+        screen.blit(text, text_rect)
+        screen.blit(volume_text, volume_rect)
+        pygame.display.flip()
+    pygame.quit()
+
+
+def Graphik():
+    running = True
+    pygame.init()
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    color = (255, 255, 255)
+    color1 = (22, 26, 30)
+    color2 = (192, 5, 248)
+    x, y = 200, 200
+    rect_x, rect_y, rect_width, rect_height = 0, 200, 800, 20  # Параметры прямоугольника
+    x_old, x_new = 0, 0
+    moving = False  # Добавляем инициализацию переменной moving
+    clock = pygame.time.Clock()
+    min_fps, max_fps = 30, 120
+    min_rect_x, max_rect_x = 50, 750
+    font = pygame.font.SysFont('comicsansms', 32)
+    game = font.render("Количество FPS", 1, color2, color)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if x < event.pos[0] < x + 100 and y < event.pos[1] < y + 100:
+                    moving = True
+                elif exitt[2].collidepoint(event.pos):
+                    settings(screen)
+
+            if event.type == pygame.MOUSEMOTION:
+                if moving:
+                    x_new, y_new = event.rel
+                    x, y = x + x_new, y + y_new
+                    if x < min_rect_x:
+                        x = min_rect_x
+                    elif x > max_rect_x:
+                        x = max_rect_x
+                    current_fps = int((x - min_rect_x) / (max_rect_x - min_rect_x) * (max_fps - min_fps) + min_fps)
+                    pygame.display.set_caption(f"Current FPS: {current_fps}")
+                    clock.tick(current_fps)
+
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                moving = False
+
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, color, (rect_x, rect_y, rect_width, rect_height))
+        pygame.draw.circle(screen, (0, 0, 255), (x, 200), 50)
+        pygame.draw.rect(screen, color1, exitt[2])
         screen.blit(exitt[0], exitt[1])
-        screen.blit(opis, (200, 200))
-        pygame.draw.rect(screen, color, game[2])
-        screen.blit(game[0], game[1])
-
+        screen.blit(game, (300, 50))
         pygame.display.update()
         pygame.display.flip()
+
+    pygame.quit()
 
 
 pygame.init()

@@ -26,7 +26,19 @@ def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0
     return (text_surface, text_rect, button_rect, text)
 
 
-
+def money():
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT coins FROM person').fetchall()
+    font = pygame.font.Font(None, 50)
+    text_surface = font.render(f'{str(res[0][0])} Zom', True, (255, 255, 255))
+    button_width = text_surface.get_width() + 40
+    button_height = text_surface.get_height() + 20
+    button_x = screen_width - button_width
+    button_y = 0
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    return (text_surface, text_rect, button_rect, f'{str(res[0][0])} Zom')
 
 def weapon1():
     LOADING_BG = pygame.image.load("weapon/G22.png")
@@ -70,6 +82,7 @@ def weapon1():
                             cur.execute('UPDATE person SET gun = 1')
                             con.commit()
                             con.close()
+
         pygame.draw.rect(screen, (0, 0, 0), button_rect)
         screen.blit(text_surface, text_rect)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -79,6 +92,9 @@ def weapon1():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -174,6 +190,9 @@ def weapon2():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -268,6 +287,9 @@ def weapon3():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -362,6 +384,9 @@ def weapon4():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -456,6 +481,9 @@ def weapon5():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -550,6 +578,9 @@ def weapon6():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -644,6 +675,9 @@ def weapon7():
         screen.blit(yst[0], yst[1])
         pygame.draw.rect(screen, (0, 0, 0), gun1[2])
         screen.blit(gun1[0], gun1[1])
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
@@ -693,6 +727,9 @@ def shop():
                         running = False
         screen.fill((0, 0, 0))
         screen.blit(LOADING_BG, LOADING_BG_RECT)
+        a = money()
+        pygame.draw.rect(screen, (0, 0, 0), a[2])
+        screen.blit(a[0], a[1])
         screen.blit(name[0], name[1])
         pygame.draw.rect(screen, color, exitt[2])
         screen.blit(exitt[0], exitt[1])
@@ -880,8 +917,7 @@ while running:
             if event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
                 if button[2].collidepoint(mouse_pos):
-                    a()
-                    exit()
+                    ...
                 if button1[2].collidepoint(mouse_pos):
                     running = False
                 if button2[2].collidepoint(mouse_pos):

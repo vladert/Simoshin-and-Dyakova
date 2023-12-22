@@ -1,7 +1,7 @@
 import sqlite3
-
+from main1 import loading
 import pygame
-
+from level import a
 
 def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0):
     font = pygame.font.Font(None, 50)
@@ -880,7 +880,8 @@ while running:
             if event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
                 if button[2].collidepoint(mouse_pos):
-                    ...
+                    a()
+                    exit()
                 if button1[2].collidepoint(mouse_pos):
                     running = False
                 if button2[2].collidepoint(mouse_pos):

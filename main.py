@@ -782,7 +782,7 @@ def settings(screen):
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     if game[2].collidepoint(mouse_pos):
-                        Game()
+                        about_game()
                         screen.fill((0, 0, 0))
                     if account[2].collidepoint(mouse_pos):
                         Account()
@@ -812,7 +812,7 @@ def settings(screen):
         pygame.display.flip()
 
 
-def Game():
+def about_game():
     running = True
     pygame.init()
     screen_width, screen_height = 800, 600
@@ -839,7 +839,7 @@ def Game():
                 if event.button == 1:
                     if exitt[2].collidepoint(mouse_pos):
                         settings(screen)
-                        screen.fill(0, 0, 0)
+                        screen.fill((0, 0, 0))
 
         screen.blit(LOADING_BG, LOADING_BG_RECT)
         pygame.draw.rect(screen, color, exitt[2])
@@ -897,6 +897,57 @@ def Game():
         pygame.display.update()
         pygame.display.flip()
 
+def levels():
+    running = True
+    screen_width, screen_height = 800, 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    name = get_component_button(screen_width, screen_height, 'Уровни', -230, 100)
+    lev1 = get_component_button(screen_width, screen_height, 'I', -100, 100)
+    lev2 = get_component_button(screen_width, screen_height, 'II', -20, 100)
+    lev3 = get_component_button(screen_width, screen_height, 'III', 50, 100)
+    lev4 = get_component_button(screen_width, screen_height, 'IV', 120, 100)
+    lev5 = get_component_button(screen_width, screen_height, 'V', 190, 100)
+    exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
+    while running:
+        # внутри игрового цикла ещё один цикл
+        # приема и обработки сообщений
+        for event in pygame.event.get():
+            # при закрытии окна
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if lev1[2].collidepoint(mouse_pos):
+                        a()
+                    if lev2[2].collidepoint(mouse_pos):
+                        ...
+                    if lev3[2].collidepoint(mouse_pos):
+                        ...
+                    if lev4[2].collidepoint(mouse_pos):
+                        ...
+                    if lev5[2].collidepoint(mouse_pos):
+                        ...
+                    if exitt[2].collidepoint(mouse_pos):
+                        running = False
+        screen.fill((0, 0, 0))
+        screen.blit(name[0], name[1])
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+        pygame.draw.rect(screen, color, lev1[2])
+        screen.blit(lev1[0], lev1[1])
+        pygame.draw.rect(screen, color, lev2[2])
+        screen.blit(lev2[0], lev2[1])
+        pygame.draw.rect(screen, color, lev3[2])
+        screen.blit(lev3[0], lev3[1])
+        pygame.draw.rect(screen, color, lev4[2])
+        screen.blit(lev4[0], lev4[1])
+        pygame.draw.rect(screen, color, lev5[2])
+        screen.blit(lev5[0], lev5[1])
+
+        # обновление экрана
+        clock.tick(50)
+        pygame.display.flip()
 
 pygame.init()
 screen_width, screen_height = 800, 600
@@ -917,7 +968,7 @@ while running:
             if event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
                 if button[2].collidepoint(mouse_pos):
-                    ...
+                    levels()
                 if button1[2].collidepoint(mouse_pos):
                     running = False
                 if button2[2].collidepoint(mouse_pos):

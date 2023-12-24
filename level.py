@@ -46,6 +46,7 @@ def a():
     player = None
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
+    wall_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
 
     # Функция загрузки изображения
@@ -84,7 +85,7 @@ def a():
                 if level[y][x] == '.':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                 elif level[y][x] == '#':
-                    Tile('wall', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
+                    Tile('wall', x, y, wall_group, all_sprites, tile_images, tile_width, tile_height)
                 elif level[y][x] == '@':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                     params = {
@@ -104,7 +105,7 @@ def a():
 
     def proverka():
         print(tiles_group)
-        if pygame.sprite.spritecollideany(tiles_group):
+        if pygame.sprite.spritecollide(player, tiles_group, False):
             print(111)
 
     # Реестр изображений
@@ -166,6 +167,7 @@ def a():
 
         screen.fill(pygame.Color(0, 0, 0))
         tiles_group.draw(screen)
+        wall_group.draw(screen)
         mouse_pos = pygame.mouse.get_pos()
         player.update(mouse_pos)
         player_group.draw(screen)

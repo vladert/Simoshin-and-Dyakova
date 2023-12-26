@@ -722,6 +722,7 @@ def settings(screen):
     screen_width, screen_height = 800, 600
     screen = pygame.display.set_mode((screen_width, screen_height))
     color = (22, 26, 30)
+    pygame.display.set_caption('Настройки')
 
     # Задний фон
     LOADING_BG = pygame.image.load("settings.jpg")
@@ -732,7 +733,7 @@ def settings(screen):
 
     # Кнопочки
     game = get_component_button(screen_width, screen_height, 'Об игре', -200, 100)
-    account = get_component_button(screen_width, screen_height, 'Аккаунт', -100, 100)
+    cheets = get_component_button(screen_width, screen_height, 'Читы', -100, 100)
     zvuk = get_component_button(screen_width, screen_height, 'Звук', 0, 100)
     graphik = get_component_button(screen_width, screen_height, 'Графика', 100, 100)
     exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
@@ -747,8 +748,8 @@ def settings(screen):
                     if game[2].collidepoint(mouse_pos):
                         Gaming()
                         screen.fill((0, 0, 0))
-                    if account[2].collidepoint(mouse_pos):
-                        Account()
+                    if cheets[2].collidepoint(mouse_pos):
+                        Cheets()
                         screen.fill((0, 0, 0))
                     if zvuk[2].collidepoint(mouse_pos):
                         Zvuk()
@@ -763,8 +764,8 @@ def settings(screen):
         screen.blit(exitt[0], exitt[1])
         pygame.draw.rect(screen, color, game[2])
         screen.blit(game[0], game[1])
-        pygame.draw.rect(screen, color, account[2])
-        screen.blit(account[0], account[1])
+        pygame.draw.rect(screen, color, cheets[2])
+        screen.blit(cheets[0], cheets[1])
         pygame.draw.rect(screen, color, zvuk[2])
         screen.blit(zvuk[0], zvuk[1])
         pygame.draw.rect(screen, color, graphik[2])
@@ -781,6 +782,7 @@ def Gaming():
     screen = pygame.display.set_mode((screen_width, screen_height))
     color = (22, 26, 30)
     color2 = (192, 5, 248)
+    pygame.display.set_caption('Наша игра')
     LOADING_BG = pygame.image.load("game_settings.jpg")
     LOADING_BG_RECT = LOADING_BG.get_rect(center=(400, 340))
     LOADING_BG = pygame.transform.scale(LOADING_BG, (screen_width, screen_height))
@@ -801,7 +803,7 @@ def Gaming():
                 if event.button == 1:
                     if exitt[2].collidepoint(mouse_pos):
                         settings(screen)
-                        screen.fill(0, 0, 0)
+                        screen.fill((0, 0, 0))
 
         screen.blit(LOADING_BG, LOADING_BG_RECT)
         pygame.draw.rect(screen, color, exitt[2])
@@ -813,38 +815,81 @@ def Gaming():
         pygame.display.update()
         pygame.display.flip()
 
-def Account():
-    ...
+
+def Cheets():
+    cheets_image = pygame.image.load('cheets.png')
+    cheets_rect = cheets_image.get_rect()
+    width, height = screen.get_size()
+    color = (22, 26, 30)
+    pygame.display.set_caption('Какие тебе читы?')
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if mouse_pos[0] < 140 and mouse_pos[1] > height - 60:
+                        settings(screen)
+        screen.fill((0, 0, 0))
+        screen.blit(cheets_image, (0, 0))
+        pygame.draw.rect(screen, color, (10, height - 50, 130, 45))
+        font = pygame.font.Font(None, 36)
+        back_text = font.render("Назад", True, (255, 255, 255))
+        screen.blit(back_text, (20, height - 40))
+
+        no_cheats_text = font.render("В нашей игре нету читов!!!", True, (255, 0, 0))  # Красный цвет текста
+        screen.blit(no_cheats_text, (10, 500))  # Размещаем текст под изображением
+
+        pygame.display.flip()
+    pygame.quit()
 
 
 def Zvuk():
     BLACK = (255, 255, 255)
     WHITE = (0, 0, 0)
-    # Параметры окна
     width, height = 800, 600
     screen = pygame.display.set_mode((width, height))
     exitt = get_component_button(screen_width, screen_height, 'Назад', 270)
     pygame.display.set_caption('Управление громкостью')
-    # Параметры ползунка
-    slider_x = 50
-    slider_y = height // 6
-    slider_width = 200
-    slider_height = 20
-    slider_rect = pygame.Rect(slider_x, slider_y, slider_width, slider_height)
-    slider_color = (0, 128, 255)
-    slider_pressed = False
+
+    # Параметры ползунка для эффектов
+    slider_x1 = 50
+    slider_y1 = height // 6
+    slider_width1 = 500
+    slider_height1 = 20
+    slider_rect1 = pygame.Rect(slider_x1, slider_y1, slider_width1, slider_height1)
+    slider_color1 = (0, 128, 255)
+    slider_pressed1 = False
     font = pygame.font.Font(None, 36)
-    text = font.render('Громкость эффектов', True, BLACK)
-    text_rect = text.get_rect(center=(width // 4, 50))
+    text1 = font.render('Громкость эффектов', True, BLACK)
+    text_rect1 = text1.get_rect(center=(width // 4, 50))
+
     zv1_min = 0
     zv1_max = 100
+    volume_text1 = font.render("Громкость: 0", True, BLACK)
+    volume_rect1 = volume_text1.get_rect(center=(width // 2, height // 4))
 
-    volume_text = font.render("Громкость: 0", True, BLACK)  # Инициализация volume_text перед основным циклом
-    volume_rect = volume_text.get_rect(center=(width // 2, height - 50))
+    # Параметры ползунка для музыки
+    slider_x2 = 50
+    slider_y2 = (height // 6) * 3.5
+    slider_width2 = 500
+    slider_height2 = 20
+    slider_rect2 = pygame.Rect(slider_x2, slider_y2, slider_width2, slider_height2)
+    slider_color2 = (255, 0, 0)  # Красный цвет для отличия от первого ползунка
+    slider_pressed2 = False
+    text2 = font.render('Громкость музыки', True, BLACK)
+    text_rect2 = text2.get_rect(center=(width // 4, (height // 6) * 2  + 100))  # Немного выше второго ползунка
 
-    # Основной цикл
+    zv2_min = 0
+    zv2_max = 100
+    volume_text2 = font.render("Громкость: 0", True, BLACK)
+    volume_rect2 = volume_text2.get_rect(center=(width // 2, (height // 6) * 2 + 200))  # Чуть ниже второго ползунка
+
     running = True
     while running:
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -853,21 +898,39 @@ def Zvuk():
                     if exitt[2].collidepoint(mouse_pos):
                         settings(screen)
                         screen.fill((0, 0, 0))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if slider_rect1.collidepoint(mouse_pos):
+                        slider_pressed1 = True
+                    elif slider_rect2.collidepoint(mouse_pos):
+                        slider_pressed2 = True
             elif event.type == pygame.MOUSEBUTTONUP:
-                slider_pressed = False
+                slider_pressed1 = False
+                slider_pressed2 = False
             elif event.type == pygame.MOUSEMOTION:
-                if slider_pressed:
-                    if slider_width - slider_rect.width != 0:  # Проверка на ноль перед делением
-                        zv1 = (slider_rect.x - slider_x) / (slider_width - slider_rect.width) * (
-                                    zv1_max - zv1_min) + zv1_min
-                        volume_text = font.render(f"Громкость: {int(zv1)}", True, BLACK)
-                        volume_rect = volume_text.get_rect(center=(width // 2, height - 50))
+                if slider_pressed1:
+                    new_x1 = min(max(event.pos[0], slider_x1), slider_x1 + slider_width1)
+                    zv1 = (new_x1 - slider_x1) / slider_width1 * (zv1_max - zv1_min) + zv1_min
+                    volume_text1 = font.render(f"Громкость: {int(zv1)}", True, BLACK)
+                if slider_pressed2:
+                    new_x2 = min(max(event.pos[0], slider_x2), slider_x2 + slider_width2)
+                    zv2 = (new_x2 - slider_x2) / slider_width2 * (zv2_max - zv2_min) + zv2_min
+                    volume_text2 = font.render(f"Громкость: {int(zv2)}", True, BLACK)
 
         screen.fill(WHITE)
-        pygame.draw.rect(screen, slider_color, slider_rect)
-        screen.blit(text, text_rect)
-        screen.blit(volume_text, volume_rect)
+        pygame.draw.rect(screen, slider_color1, slider_rect1)
+        screen.blit(text1, text_rect1)
+        screen.blit(volume_text1, volume_rect1)
+
+        pygame.draw.rect(screen, slider_color2, slider_rect2)
+        screen.blit(text2, text_rect2)
+        screen.blit(volume_text2, volume_rect2)
+        pygame.draw.rect(screen, color, exitt[2])
+        screen.blit(exitt[0], exitt[1])
+
         pygame.display.flip()
+
     pygame.quit()
 
 

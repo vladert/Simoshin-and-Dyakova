@@ -85,7 +85,7 @@ def a():
                 if level[y][x] == '.':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                 elif level[y][x] == '#':
-                    Tile('wall', x, y, wall_group, all_sprites, tile_images, tile_width, tile_height)
+                    Tile('wall', x, y, wall_group, all_sprites, tile_images, tile_width, tile_height, wall_group)
                 elif level[y][x] == '@':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                     params = {
@@ -104,9 +104,8 @@ def a():
         sys.exit()
 
     def proverka():
-        print(tiles_group)
-        if pygame.sprite.spritecollide(player, tiles_group, False):
-            print(111)
+        if pygame.sprite.spritecollide(player, wall_group, False):
+            ...
 
     # Реестр изображений
     tile_images = {'wall': load_image('rock.png'), 'empty': load_image('floor.png')}
@@ -150,14 +149,17 @@ def a():
         if keys[pygame.K_RIGHT]:
             player.rect.x += STEP
             player.current_animation = 'movement'
+            proverka()
 
         if keys[pygame.K_UP]:
             player.rect.y -= STEP
             player.current_animation = 'movement'
+            proverka()
 
         if keys[pygame.K_DOWN]:
             player.rect.y += STEP
             player.current_animation = 'movement'
+            proverka()
 
         if not any([keys[pygame.K_LEFT], keys[pygame.K_RIGHT], keys[pygame.K_UP], keys[pygame.K_DOWN]]):
             player.current_animation = 'idle'
@@ -179,4 +181,4 @@ def a():
     # Выход из игры
     terminate()
 
-
+a()

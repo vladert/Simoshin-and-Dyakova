@@ -1,3 +1,4 @@
+import math
 import os
 import sys
 import pygame
@@ -37,6 +38,7 @@ def a():
     WIDTH = 800
     HEIGHT = 600
     STEP = 2
+    BULLET_SPEED = 200
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
@@ -83,6 +85,7 @@ def a():
                 if level[y][x] == '.':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                 elif level[y][x] == '#':
+                    print(y, x)
                     Tile('wall', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height, wall_group)
                 elif level[y][x] == '@':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
@@ -105,11 +108,29 @@ def a():
 
     # Стартовое окно
 
-    def proverka():
-        print(tiles_group)
-        # if pygame.sprite.spritecollideany(wall_group):
-        #     print(111)
+    def proverka_left():
+        if pygame.sprite.spritecollideany(player, wall_group):
+            h = pygame.sprite.spritecollideany(player, wall_group)
+            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
+            player.rect.x = h.rect.x + 50
 
+    def proverka_right():
+        if pygame.sprite.spritecollideany(player, wall_group):
+            h = pygame.sprite.spritecollideany(player, wall_group)
+            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
+            player.rect.x = h.rect.x - 70
+
+    def proverka_up():
+        if pygame.sprite.spritecollideany(player, wall_group):
+            h = pygame.sprite.spritecollideany(player, wall_group)
+            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
+            player.rect.y = h.rect.y + 50
+
+    def proverka_down():
+        if pygame.sprite.spritecollideany(player, wall_group):
+            h = pygame.sprite.spritecollideany(player, wall_group)
+            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
+            player.rect.y = h.rect.y - 70
     # Реестр изображений
     tile_images = {'wall': load_image('rock.png'), 'empty': load_image('floor.png')}
     player_image = load_image('player\movement\skeleton-move_0.png', transparent=True)
@@ -118,6 +139,10 @@ def a():
 
     player_images = {'idle': [load_image(im, transparent=True) for im in idle_path_images],
                      'movement': [load_image(im, transparent=True) for im in sk]}
+    # Загрузка изображения пули
+    bullet_image = pygame.image.load("bullet.png")
+    # Позиционирование пули
+    bullet_rect = bullet_image.get_rect()
 
     class AnimatedSprite(pygame.sprite.Sprite):
         def __init__(self, x, y, *args):
@@ -138,7 +163,9 @@ def a():
     camera = Camera((level_x, level_y), WIDTH, HEIGHT)
     count = 0
     running = True
+    bullet_rect.center = (player.rect.x, player.rect.y)
     while running:
+        #screen.fill(pygame.Color(0, 0, 0))
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -147,27 +174,30 @@ def a():
         if keys[pygame.K_LEFT]:
             player.rect.x -= STEP
             player.current_animation = 'movement'
-            proverka()
+            proverka_left()
 
         if keys[pygame.K_RIGHT]:
             player.rect.x += STEP
             player.current_animation = 'movement'
+            proverka_right()
 
         if keys[pygame.K_UP]:
             player.rect.y -= STEP
             player.current_animation = 'movement'
+            proverka_up()
 
         if keys[pygame.K_DOWN]:
             player.rect.y += STEP
             player.current_animation = 'movement'
+            proverka_down()
 
         if not any([keys[pygame.K_LEFT], keys[pygame.K_RIGHT], keys[pygame.K_UP], keys[pygame.K_DOWN]]):
             player.current_animation = 'idle'
 
         for key, sprite in enumerate(all_sprites):
-            camera.apply(sprite)
+            camera.apply(player)
 
-        screen.fill(pygame.Color(0, 0, 0))
+
         tiles_group.draw(screen)
         wall_group.draw(screen)
         mouse_pos = pygame.mouse.get_pos()
@@ -181,3 +211,4 @@ def a():
 
     # Выход из игры
     terminate()
+a()

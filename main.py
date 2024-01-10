@@ -1062,6 +1062,7 @@ while running:
                 mouse_pos = pygame.mouse.get_pos()
                 if button[2].collidepoint(mouse_pos):
                     levels()
+                    screen.fill((0, 0, 0))
                 if button1[2].collidepoint(mouse_pos):
                     running = False
                 if button2[2].collidepoint(mouse_pos):

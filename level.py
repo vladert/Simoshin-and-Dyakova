@@ -103,6 +103,7 @@ def a():
 
     # Генерация уровня на основе загруженной карты
     def generate_level(level):
+        enemy_list = []
         new_player, x, y = None, None, None
         for y in range(len(level)):
             for x in range(len(level[y])):
@@ -129,8 +130,10 @@ def a():
                         'pos_y': y,
                     }
                     enemy = Enemy(enemy_images, params)
+                    enemy_list.append(enemy)
+                    enemy_group.add(enemy)
         # вернем игрока, а также размер поля в клетках
-        return new_player, enemy, x, y
+        return new_player, enemy_list, x, y
 
     # Функция закрытия приложения
     def terminate():
@@ -184,33 +187,6 @@ def a():
             # if pr_vn < pr_l and pr_vn < pr_v and pr_vn < pr_p:
             #     player.rect.x = h.rect.y + 50
 
-    def proverka_left():
-        if pygame.sprite.spritecollideany(player, wall_group):
-            h = pygame.sprite.spritecollideany(player, wall_group)
-            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
-            player.rect.x = h.rect.x + 50
-            print(h.rect.midleft, h.rect.midright, h.rect.midtop, h.rect.midbottom, h.rect.topleft, h.rect.bottomleft,
-                  h.rect.bottomright)
-
-    # середина левой грани, середина пр. гр, середина верх. гр, серед. нижней, начальные коорд., нижний левый угол, прав. ниж.угол
-    def proverka_right():
-        if pygame.sprite.spritecollideany(player, wall_group):
-            h = pygame.sprite.spritecollideany(player, wall_group)
-            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
-            player.rect.x = h.rect.x - 70
-
-    def proverka_up():
-        if pygame.sprite.spritecollideany(player, wall_group):
-            h = pygame.sprite.spritecollideany(player, wall_group)
-            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
-            player.rect.y = h.rect.y + 50
-
-    def proverka_down():
-        if pygame.sprite.spritecollideany(player, wall_group):
-            h = pygame.sprite.spritecollideany(player, wall_group)
-            print(h.rect.x, h.rect.y, player.rect.x, player.rect.y)
-            player.rect.y = h.rect.y - 70
-
     # Реестр изображений
     tile_images = {'wall': load_image('rock.png'), 'empty': load_image('floor.png')}
     player_image = load_image('player\movement\skeleton-move_0.png', transparent=True)
@@ -237,8 +213,7 @@ def a():
 
     # Загрузка и генерация уровня
     print(load_level("levelex.txt"))
-    player, enemy, level_x, level_y = generate_level(load_level("levelex.txt"))
-    enemy_group.add(enemy)
+    player, enemy_list, level_x, level_y = generate_level(load_level("levelex.txt"))
     player_group.add(player)
     # Создание камеры
     camera = Camera((level_x, level_y), WIDTH, HEIGHT)
@@ -272,6 +247,9 @@ def a():
             player.current_animation = 'movement'
             proverka()
 
+        if keys[pygame.K_k]:
+            return 0
+
         if not any([keys[pygame.K_LEFT], keys[pygame.K_RIGHT], keys[pygame.K_UP], keys[pygame.K_DOWN]]):
             player.current_animation = 'idle'
 
@@ -282,7 +260,8 @@ def a():
         wall_group.draw(screen)
         mouse_pos = pygame.mouse.get_pos()
         player.update(mouse_pos)
-        enemy.update(player.rect.x, player.rect.y)
+        for i in enemy_list:
+            i.update(player.rect.x, player.rect.y)
         enemy_group.draw(screen)
         player_group.draw(screen)
 
@@ -294,4 +273,4 @@ def a():
     terminate()
 
 
-a()
+

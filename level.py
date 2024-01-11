@@ -61,7 +61,7 @@ def a():
     FPS = 60
     WIDTH = 800
     HEIGHT = 600
-    STEP = 2
+    STEP = 3
     BULLET_SPEED = 200
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
@@ -142,50 +142,15 @@ def a():
 
     # Стартовое окно
     def proverka():
-        if pygame.sprite.spritecollideany(player, wall_group):
-            h = pygame.sprite.spritecollideany(player, wall_group)
-            x = player.rect.x
-            y = player.rect.y
-            print(x, y)
-            for i in range(h.rect.x, h.rect.x + 51):  # Вверх
-                for j in range(-5, 10):
-                    if x == i and y + j == h.rect.y:
-                        player.rect.y = h.rect.y + 60
-                        return 0
-            for i in range(h.rect.x, h.rect.x + 51):  # Вниз Отлично работает
-                for j in range(-5, 10):
-                    if x == i and y + 50 + j == h.rect.y:
-                        player.rect.y = h.rect.y - 60
-                        return 0
-            for i in range(h.rect.y, h.rect.y + 51):  # Лево
-                for j in range(-10, 10):
-                    if y + 50 == i and x + j == h.rect.x:
-                        player.rect.x = h.rect.x + 60
-                        return 0
-            for i in range(h.rect.y, h.rect.y + 51):  # Право
-                for j in range(-5, 10):
-                    if y == i and x + j == h.rect.x:
-                        player.rect.x = h.rect.x - 60
-                        return 0
-            # lef = h.rect.midleft
-            # pr = h.rect.midright
-            # up = h.rect.midtop
-            # do = h.rect.midbottom
-            # pr_p = (pr[0] - x) + (pr[1] - y)
-            # pr_l = (lef[0] - x) + (y - lef[1])
-            # pr_v = (up[0] - x)+ (up[1] - y)
-            # pr_vn = (do[0] - x) + (y - do[1])
-            # print(x, y)
-            # print(lef, pr, up, do)
-            # print(pr_p, pr_l, pr_v, pr_vn)
-            # if pr_p < pr_l and pr_p < pr_v and pr_p < pr_vn:
-            #     player.rect.x = h.rect.x + 50
-            # if pr_l < pr_p and pr_l < pr_v and pr_l < pr_vn:
-            #     player.rect.x = h.rect.x - 70
-            # if pr_v < pr_l and pr_v < pr_p and pr_v < pr_vn:
-            #     player.rect.y = h.rect.y - 70
-            # if pr_vn < pr_l and pr_vn < pr_v and pr_vn < pr_p:
-            #     player.rect.x = h.rect.y + 50
+        x = player.rect.x
+        y = player.rect.y
+        for i in enemy_group:
+            x1 = i.rect.x
+            y1 = i.rect.y
+            if x1 > x: i.rect.x -= 1
+            if x1 < x: i.rect.x += 1
+            if y1 > y: i.rect.y -= 1
+            if y1 < y: i.rect.y += 1
 
     # Реестр изображений
     tile_images = {'wall': load_image('rock.png'), 'empty': load_image('floor.png')}
@@ -195,8 +160,7 @@ def a():
 
     player_images = {'idle': [load_image(im, transparent=True) for im in idle_path_images],
                      'movement': [load_image(im, transparent=True) for im in sk]}
-    enemy_images = {'idle': [load_image(im, transparent=True) for im in idle_path_images_enemy],
-                    'movement': [load_image(im, transparent=True) for im in ck]}
+    enemy_images = {'movement': [load_image(im, transparent=True) for im in ck]}
     # Загрузка изображения пули
     bullet_image = pygame.image.load("bullet.png")
     # Позиционирование пули
@@ -230,22 +194,26 @@ def a():
         if keys[pygame.K_LEFT]:
             player.rect.x -= STEP
             player.current_animation = 'movement'
-            proverka()
+            if pygame.sprite.spritecollideany(player, wall_group):
+                player.rect.x += STEP
 
         if keys[pygame.K_RIGHT]:
             player.rect.x += STEP
             player.current_animation = 'movement'
-            proverka()
+            if pygame.sprite.spritecollideany(player, wall_group):
+                player.rect.x -= STEP
 
         if keys[pygame.K_UP]:
             player.rect.y -= STEP
             player.current_animation = 'movement'
-            proverka()
+            if pygame.sprite.spritecollideany(player, wall_group):
+                player.rect.y += STEP
 
         if keys[pygame.K_DOWN]:
             player.rect.y += STEP
             player.current_animation = 'movement'
-            proverka()
+            if pygame.sprite.spritecollideany(player, wall_group):
+                player.rect.y -= STEP
 
         if keys[pygame.K_k]:
             return 0
@@ -264,7 +232,7 @@ def a():
             i.update(player.rect.x, player.rect.y)
         enemy_group.draw(screen)
         player_group.draw(screen)
-
+        proverka()
         pygame.display.flip()
 
         clock.tick(FPS)

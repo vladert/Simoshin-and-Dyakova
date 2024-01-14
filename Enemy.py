@@ -5,13 +5,14 @@ import pygame.sprite
 
 # Класс игрока
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, images, params):
+    def __init__(self, images, h, params):
         super().__init__()
+        self.h = h
         self.cur_frame = 0
         self.images = images
         print(self.images)
 
-        self.current_animation = 'idle'
+        self.current_animation = 'movement'
         self.image = self.images[self.current_animation][0]
         self.rect = self.image.get_rect().move(params['tile_width'] * params['pos_x'] + 15,
                                                params['tile_height'] * params['pos_y'] + 5)
@@ -29,4 +30,11 @@ class Enemy(pygame.sprite.Sprite):
         self.image = self.images[self.current_animation][self.cur_frame]
 
         self.image, self.rect = self.rotate_enemy_towards_mouse(x, y)
+
+    def battle(self, health):
+        self.h -= health
+        return self.h
+
+    def health(self):
+        return self.h
 

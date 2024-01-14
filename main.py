@@ -4,6 +4,20 @@ import pygame
 from level import a
 
 
+def cost():
+    con = sqlite3.connect('weapon.db')
+    cur = con.cursor()
+    res = cur.execute('SELECT coins FROM person WHERE id == 1').fetchall()
+    font = pygame.font.Font(None, 50)
+    text_surface = font.render(f'{res[0][0]} zom', True, (255, 255, 255))
+    button_width = text_surface.get_width() + 40
+    button_height = text_surface.get_height() + 20
+    button_x = screen_width - button_width
+    button_y = button_height - 50
+    button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    return (text_surface, text_rect, button_rect, f'{res[0][0]} zom')
+
 def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0):
     font = pygame.font.Font(None, 50)
     if text == 'Kill all Zombie' or text == 'Оружия':
@@ -74,6 +88,9 @@ def weapon1():
         pygame.draw.rect(screen, (0, 0, 0), button_rect)
         screen.blit(text_surface, text_rect)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, color, exitt[2])
         screen.blit(exitt[0], exitt[1])
         pygame.draw.rect(screen, color, yst[2])
@@ -166,6 +183,9 @@ def weapon2():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -260,6 +280,9 @@ def weapon3():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -354,6 +377,9 @@ def weapon4():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -377,6 +403,7 @@ def weapon5():
     cur = con.cursor()
     res = cur.execute('SELECT gun, characteristics, open FROM weapons WHERE id == 5').fetchall()
     res2 = cur.execute('SELECT gun, coins FROM person').fetchall()
+    print(res2)
     text1 = ' '.join(res[0][1].split()[:10])
     text2 = ' '.join(res[0][1].split()[10:16])
     text3 = ' '.join(res[0][1].split()[16:])
@@ -448,6 +475,9 @@ def weapon5():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -542,6 +572,9 @@ def weapon6():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -636,6 +669,9 @@ def weapon7():
         screen.blit(text_surface, text_rect)
         pygame.draw.rect(screen, (0, 0, 0), button_rect1)
         screen.blit(text_surface1, text_rect1)
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, (0, 0, 0), button_rect2)
         screen.blit(text_surface2, text_rect2)
         screen.blit(LOADING_BG, LOADING_BG_RECT)
@@ -695,6 +731,9 @@ def shop():
         screen.fill((0, 0, 0))
         screen.blit(LOADING_BG, LOADING_BG_RECT)
         screen.blit(name[0], name[1])
+        a = cost()
+        pygame.draw.rect(screen, color, a[2])
+        screen.blit(a[0], a[1])
         pygame.draw.rect(screen, color, exitt[2])
         screen.blit(exitt[0], exitt[1])
         pygame.draw.rect(screen, color, gun1[2])

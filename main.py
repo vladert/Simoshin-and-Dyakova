@@ -18,6 +18,7 @@ def cost():
     text_rect = text_surface.get_rect(center=button_rect.center)
     return (text_surface, text_rect, button_rect, f'{res[0][0]} zom')
 
+
 def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0):
     font = pygame.font.Font(None, 50)
     if text == 'Kill all Zombie' or text == 'Оружия':
@@ -39,8 +40,6 @@ def get_component_button(screen_width, screen_height, text, step=0, x=1, stepx=0
     text_rect = text_surface.get_rect(center=button_rect.center)
 
     return (text_surface, text_rect, button_rect, text)
-
-
 
 
 def weapon1():
@@ -68,7 +67,7 @@ def weapon1():
         yst = get_component_button(screen_width, screen_height, 'Выбран', 200, 1, 300)
     else:
         yst = get_component_button(screen_width, screen_height, 'Взять', 200, 1, 300)
-   # return (text_surface, text_rect, button_rect)
+    # return (text_surface, text_rect, button_rect)
     while running:
         for event in pygame.event.get():
             # при закрытии окна
@@ -100,7 +99,6 @@ def weapon1():
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
-
 
 
 def weapon2():
@@ -177,7 +175,6 @@ def weapon2():
                                 cur.execute(f'UPDATE person SET coins = {summ}')
                                 cur.execute('UPDATE weapons SET open = 1 WHERE gun == "UMP"')
                                 con.commit()
-
 
         pygame.draw.rect(screen, (0, 0, 0), button_rect)
         screen.blit(text_surface, text_rect)
@@ -755,6 +752,7 @@ def shop():
         clock.tick(50)
         pygame.display.flip()
 
+
 def levels():
     running = True
     screen_width, screen_height = 800, 600
@@ -777,15 +775,15 @@ def levels():
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     if lev1[2].collidepoint(mouse_pos):
-                        a()
+                        a('levelex.txt', 1)
                     if lev2[2].collidepoint(mouse_pos):
-                        ...
+                        a('levx2.txt', 2)
                     if lev3[2].collidepoint(mouse_pos):
-                        ...
+                        a('levx3.txt', 3)
                     if lev4[2].collidepoint(mouse_pos):
-                        ...
+                        a('levx4.txt', 3)
                     if lev5[2].collidepoint(mouse_pos):
-                        ...
+                        a('levx5.txt', 10, 300)
                     if exitt[2].collidepoint(mouse_pos):
                         running = False
         screen.fill((0, 0, 0))
@@ -806,6 +804,7 @@ def levels():
         # обновление экрана
         clock.tick(50)
         pygame.display.flip()
+
 
 def settings(screen):
     running = True
@@ -971,7 +970,7 @@ def Zvuk():
     slider_color2 = (255, 0, 0)  # Красный цвет для отличия от первого ползунка
     slider_pressed2 = False
     text2 = font.render('Громкость музыки', True, BLACK)
-    text_rect2 = text2.get_rect(center=(width // 4, (height // 6) * 2  + 100))  # Немного выше второго ползунка
+    text_rect2 = text2.get_rect(center=(width // 4, (height // 6) * 2 + 100))  # Немного выше второго ползунка
 
     zv2_min = 0
     zv2_max = 100

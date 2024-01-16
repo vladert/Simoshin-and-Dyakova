@@ -10,7 +10,7 @@ from player import Player
 from tile import Tile
 
 
-def a():
+def a(file, All_ENEMY, HEALTH_ENEMY=100):
     # Инициализация окна
     pygame.init()
     # Обработка повторного срабатывания клавиш
@@ -62,15 +62,13 @@ def a():
     HEIGHT = 600
     STEP = 3
     HEALTH = 100
-    HEALTH_ENEMY = 100
+    SPRITE_ENEMY = ''
     GAME = True
-    All_ENEMY = 0
     KOL_ENEMY = 0
     KOL_BULLET = 0
     con = sqlite3.connect('weapon.db')
     cur = con.cursor()
     res2 = cur.execute('SELECT gun FROM person WHERE id == 1').fetchall()
-    print(res2)
     res = cur.execute(f'SELECT health FROM weapons WHERE id == {res2[0][0]}').fetchall()
     HEALTH_BULLET = res[0][0]
     con.close()
@@ -123,7 +121,6 @@ def a():
                 if level[y][x] == '.':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
                 elif level[y][x] == '#':
-                    print(y, x)
                     Tile('wall', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height, wall_group)
                 elif level[y][x] == '@':
                     Tile('empty', x, y, tiles_group, all_sprites, tile_images, tile_width, tile_height)
@@ -143,25 +140,15 @@ def a():
                         'pos_y': y,
                     }
                     ALL_ENEMY += 1
+                    print(12121212)
+
                     enemy = Enemy(enemy_images, HEALTH_ENEMY, params)
                     enemy_list.append(enemy)
+                    print(enemy_list[0])
                     enemy_group.add(enemy)
         # вернем игрока, а также размер поля в клетках
+        enemy_list.append(enemy)
         return new_player, enemy_list, x, y
-
-    # Функция закрытия приложения
-    def terminate():
-        pygame.quit()
-        sys.exit()
-
-    # def bullet():
-    #     for event in pygame.event.get():
-    #         print(1)
-    #         if event.type == pygame.MOUSEBUTTONDOWN:
-    #             mouse_pos = pygame.mouse.get_pos()
-    #             X, Y = mouse_pos[0], mouse_pos[1]
-    #             bullet = BulletTile('bullet', player.rect.x, player.rect.y, bullet_group, all_sprites, tile_images, X, Y)
-    #             bullet_group.add(bullet)
 
 
     def proverka(KOL_ENEMY):
@@ -185,9 +172,9 @@ def a():
                 c.kill()
                 h = Enemy.battle(i, HEALTH_BULLET)
                 if h <= 0:
+                    print(enemy_group, i)
                     enemy_list.remove(i)
                     KOL_ENEMY += 1
-                print(h)
 
             if Enemy.health(i) < 0:
                 i.kill()
@@ -208,8 +195,7 @@ def a():
 
 
     # Загрузка и генерация уровня
-    print(load_level("levelex.txt"))
-    player, enemy_list, level_x, level_y = generate_level(All_ENEMY, load_level("levelex.txt"))
+    player, enemy_list, level_x, level_y = generate_level(All_ENEMY, load_level(file))
     player_group.add(player)
     # Создание камеры
     camera = Camera((level_x, level_y), WIDTH, HEIGHT)
@@ -270,7 +256,7 @@ def a():
         for i in enemy_list:
             i.update(player.rect.x, player.rect.y)
         if not bool(enemy_list):
-            finaly(HEALTH, KOL_BULLET, KOL_ENEMY, All_ENEMY)
+            finaly(HEALTH, KOL_BULLET, KOL_ENEMY, All_ENEMY, file, HEALTH_ENEMY)
         for i in bullet_list:
             X, Y = BulletTile.upp(i)
             x1 = i.rect.x
@@ -291,14 +277,17 @@ def a():
             if pygame.sprite.spritecollideany(i, wall_group):
                 i.kill()
         if pygame.sprite.spritecollideany(player, enemy_group):
-            if GAME:
-                HEALTH -= 20
-                GAME = False
-            print(HEALTH)
+            if SPRITE_ENEMY != pygame.sprite.spritecollideany(player, enemy_group):
+                if GAME:
+                    print(HEALTH)
+                    HEALTH -= 20
+                    SPRITE_ENEMY = pygame.sprite.spritecollideany(player, enemy_group)
+                    GAME = False
         else:
+            SPRITE_ENEMY = ''
             GAME = True
         if HEALTH <= 0:
-            finaly(HEALTH, KOL_BULLET, KOL_ENEMY, All_ENEMY)
+            finaly(HEALTH, KOL_BULLET, KOL_ENEMY, All_ENEMY, file, HEALTH_ENEMY)
         bullet_group.draw(screen)
         enemy_group.draw(screen)
         player_group.draw(screen)
@@ -307,6 +296,6 @@ def a():
 
         clock.tick(FPS)
 
-    # Выход из игры
-    terminate()
+    pygame.quit()
+    sys.exit()
 
